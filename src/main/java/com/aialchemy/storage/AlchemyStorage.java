@@ -354,7 +354,7 @@ public final class AlchemyStorage {
 
 				if (scripts.has(item.itemId())) {
 					item = new GeneratedItem(item.itemId(), item.recipeKey(), item.name(), item.lore(), item.shell(),
-							item.rarity(), item.stats(), item.effects(), item.palette(), item.icon(), item.model(),
+							item.rarity(), item.stats(), item.effects(), item.blockTraits(), item.palette(), item.icon(), item.model(),
 							scripts.get(item.itemId()).getAsString(), item.tier(), item.discoverer(), item.createdAt(),
 							item.notes(), false);
 				}

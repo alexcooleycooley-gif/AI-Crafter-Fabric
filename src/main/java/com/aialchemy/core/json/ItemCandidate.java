@@ -18,7 +18,8 @@ public record ItemCandidate(
 		List<String> icon,
 		JsonObject model,
 		String lua,
-		List<EffectSpec> effects) {
+		List<EffectSpec> effects,
+		BlockSpec blockTraits) {
 
 	/** Raw stats exactly as the model wrote them; clamping happens later. */
 	public record StatBlock(
@@ -34,6 +35,10 @@ public record ItemCandidate(
 	}
 
 	/** A status effect the item applies, drawn from the allowlist. */
-	public record EffectSpec(String id, int ticks, int amplifier) {
-	}
+		public record EffectSpec(String id, int ticks, int amplifier) {
+		}
+
+		public record BlockSpec(String trait, int lightLevel, float friction, float bounce,
+				float hardness, boolean emitsParticles) {
+		}
 }

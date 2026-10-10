@@ -72,12 +72,21 @@ public class AlchemyItem extends Item {
 		BlockPos placePos = context.getClickedPos().relative(context.getClickedFace());
 		if (!context.getLevel().getBlockState(placePos).canBeReplaced()) return InteractionResult.FAIL;
 		AlchemyData data = dataOf(context.getItemInHand());
-		int choice = Math.floorMod(data == null ? 0 : data.itemId().hashCode(), 5);
-		var block = switch (choice) {
-			case 0 -> Blocks.SEA_LANTERN;
-			case 1 -> Blocks.SLIME_BLOCK;
-			case 2 -> Blocks.HONEY_BLOCK;
-			case 3 -> Blocks.AMETHYST_BLOCK;
+		String trait = "fortified";
+		com.aialchemy.core.BlockTraits traits = com.aialchemy.core.BlockTraits.DEFAULT;
+		if (data != null && AiAlchemy.state() != null) {
+			var generated = AiAlchemy.state().storage().cachedByItemId(data.itemId());
+			if (generated != null && generated.blockTraits() != null) traits = generated.blockTraits();
+		}
+		if (traits.lightLevel() >= 8) trait = "luminous";
+		else if (traits.bounce() >= 0.5f) trait = "bouncy";
+		else if (traits.friction() <= 0.4f) trait = "slippery";
+		else if (traits.trait().equals("resonant")) trait = "resonant";
+		var block = switch (trait) {
+			case "luminous" -> Blocks.SEA_LANTERN;
+			case "bouncy" -> Blocks.SLIME_BLOCK;
+			case "slippery" -> Blocks.HONEY_BLOCK;
+			case "resonant" -> Blocks.AMETHYST_BLOCK;
 			default -> Blocks.OBSIDIAN;
 		};
 		if (!context.getLevel().setBlock(placePos, block.defaultBlockState(), 3)) return InteractionResult.FAIL;
@@ -150,7 +159,15 @@ public class AlchemyItem extends Item {
 			tooltip.accept(Component.empty());
 				tooltip.accept(Component.translatable("tooltip.ai_alchemy.tier", data.tier()).withStyle(ChatFormatting.DARK_AQUA));
 				if (this.shell == Shell.BLOCK) {
-					tooltip.accept(Component.literal("Trait: " + blockTrait(data.itemId())).withStyle(ChatFormatting.AQUA));
+					tooltip.accept(Component.literal("Trait: " + (item.blockTraits() == null ? blockTrait(data.itemId())
+							: item.blockTraits().trait())).withStyle(ChatFormatting.AQUA));
+					if (item.blockTraits() != null) {
+						var traits = item.blockTraits();
+						tooltip.accept(Component.literal("Light " + traits.lightLevel() + " | friction "
+								+ String.format(java.util.Locale.ROOT, "%.2f", traits.friction())
+								+ " | bounce " + String.format(java.util.Locale.ROOT, "%.2f", traits.bounce()))
+								.withStyle(ChatFormatting.DARK_AQUA));
+					}
 				}
 
 			if (data.hasScript()) {

@@ -3,6 +3,7 @@ package com.aialchemy.core.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aialchemy.core.BlockTraits;
 import com.aialchemy.core.GeneratedItem;
 import com.aialchemy.core.ItemEffect;
 import com.aialchemy.core.Rarity;
@@ -123,8 +124,14 @@ public final class ValidationPipeline {
 			issues.warning("stats.clamped", "AI stats were clamped to tier " + context.tier() + " ranges");
 		}
 
-		List<ItemEffect> effects = filterEffects(candidate.effects(), context, issues);
-		Rarity rarity = Rarity.byJsonName(candidate.rarity());
+			List<ItemEffect> effects = filterEffects(candidate.effects(), context, issues);
+			Rarity rarity = Rarity.byJsonName(candidate.rarity());
+			BlockTraits blockTraits = BlockTraits.DEFAULT;
+			if (shell == Shell.BLOCK && candidate.blockTraits() != null) {
+				ItemCandidate.BlockSpec raw = candidate.blockTraits();
+				blockTraits = BlockTraits.from(raw.trait(), raw.lightLevel(), raw.friction(), raw.bounce(),
+						raw.hardness(), raw.emitsParticles());
+			}
 
 		// 4. Icon check (never fatal).
 		boolean fallbackIcon = false;
@@ -205,9 +212,10 @@ public final class ValidationPipeline {
 				list(candidate.lore()),
 				shell,
 				rarity,
-				clamped,
-				effects,
-				palette,
+					clamped,
+					effects,
+					blockTraits,
+					palette,
 				icon,
 				model,
 				script,

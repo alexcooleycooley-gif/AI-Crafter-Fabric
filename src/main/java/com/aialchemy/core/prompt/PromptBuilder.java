@@ -123,7 +123,11 @@ public final class PromptBuilder {
 				    "display": { "hand": 1.0, "ground": 0.8 },
 				    "idle_effect": "pulse"
 				  },
-				  "lua": "function on_use(player, world)\\n  ...\\nend",
+					  "block_traits": {
+					    "trait": "luminous", "light_level": 12, "friction": 0.6,
+					    "bounce": 0.0, "hardness": 5.0, "emits_particles": true
+					  },
+					  "lua": "function on_use(player, world)\\n  ...\\nend",
 				  "effects": [{ "id": "minecraft:speed", "ticks": 100, "amplifier": 0 }]
 				}
 
@@ -184,7 +188,11 @@ public final class PromptBuilder {
 				- Optional "pattern": %s.
 				- Optional "emissive": true. At most %s%% of the parts may be emissive in this tier.
 				- Optional "idle_effect": %s.
-				- "display" scales are clamped to %s .. %s.
+					- "display" scales are clamped to %s .. %s.
+					- For the block shell only, include "block_traits": trait luminous, bouncy, slippery,
+					  resonant or fortified; light_level 0-15; friction 0.2-1.0; bounce 0-1; hardness 0.1-50;
+					  and emits_particles true or false. These values are bounded and mapped to safe vanilla
+					  behavior when the block is placed.
 					- The grip point must lie inside the model's bounding box.
 					- Design rules: one recognisable shape, grip near the bottom, silhouette readable at a
 					  glance. Use 4-10 purposeful parts with a main body, a distinctive feature and a small

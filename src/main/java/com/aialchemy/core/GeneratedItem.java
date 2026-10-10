@@ -23,6 +23,7 @@ public record GeneratedItem(
 		Rarity rarity,
 		StatSet stats,
 		List<ItemEffect> effects,
+		BlockTraits blockTraits,
 		Palette palette,
 		PixelIcon icon,
 		CuboidModel model,
@@ -64,15 +65,15 @@ public record GeneratedItem(
 		return this.discoverer == null || this.discoverer.isBlank() ? "unknown" : this.discoverer;
 	}
 
-	public GeneratedItem withScriptDisabled() {
+		public GeneratedItem withScriptDisabled() {
 		return new GeneratedItem(this.itemId, this.recipeKey, this.name, this.lore, this.shell, this.rarity,
-				this.stats, this.effects, this.palette, this.icon, this.model, this.script, this.tier, this.discoverer,
+				this.stats, this.effects, this.blockTraits, this.palette, this.icon, this.model, this.script, this.tier, this.discoverer,
 				this.createdAt, this.notes, true);
 	}
 
 	public GeneratedItem withDiscoverer(String playerId, long timestamp) {
 		return new GeneratedItem(this.itemId, this.recipeKey, this.name, this.lore, this.shell, this.rarity,
-				this.stats, this.effects, this.palette, this.icon, this.model, this.script, this.tier, playerId,
+				this.stats, this.effects, this.blockTraits, this.palette, this.icon, this.model, this.script, this.tier, playerId,
 				timestamp == 0L ? this.createdAt : timestamp, this.notes, this.scriptDisabled);
 	}
 

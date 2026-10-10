@@ -192,7 +192,7 @@ public final class TransmuteService {
 
 		return new GeneratedItem(itemId, recipeKey, "Unnamed " + shell.jsonName(), List.of(
 				"Crafted offline from " + grid.ingredients().size() + " ingredients."),
-				shell, com.aialchemy.core.Rarity.COMMON, stats, List.of(), palette,
+				 shell, com.aialchemy.core.Rarity.COMMON, stats, List.of(), com.aialchemy.core.BlockTraits.DEFAULT, palette,
 				ProceduralIcon.build(palette, shell, itemId.hashCode()), null, null, tierFor(grid.ingredients()),
 				player.getGameProfile().name(), System.currentTimeMillis(), List.of(), true);
 	}

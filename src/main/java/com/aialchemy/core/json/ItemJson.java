@@ -3,6 +3,7 @@ package com.aialchemy.core.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aialchemy.core.BlockTraits;
 import com.aialchemy.core.GeneratedItem;
 import com.aialchemy.core.ItemEffect;
 import com.aialchemy.core.Rarity;
@@ -115,7 +116,16 @@ public final class ItemJson {
 				}
 			}
 
-			return new ParseResult(new ItemCandidate(
+				ItemCandidate.BlockSpec blockTraits = null;
+				if (root.has("block_traits") && root.get("block_traits").isJsonObject()) {
+					JsonObject block = root.getAsJsonObject("block_traits");
+					blockTraits = new ItemCandidate.BlockSpec(
+							block.has("trait") ? block.get("trait").getAsString() : "fortified",
+							intOf(block, "light_level"), floatOf(block, "friction"), floatOf(block, "bounce"),
+							floatOf(block, "hardness"), block.has("emits_particles") && block.get("emits_particles").getAsBoolean());
+				}
+
+				return new ParseResult(new ItemCandidate(
 					root.get("name").getAsString(),
 					lore,
 					root.get("shell").getAsString(),
@@ -125,7 +135,7 @@ public final class ItemJson {
 					icon,
 					model,
 					lua,
-					effects), null);
+						effects, blockTraits), null);
 		} catch (JsonSyntaxException | IllegalStateException | UnsupportedOperationException exception) {
 			return new ParseResult(null, "invalid JSON: " + exception.getMessage());
 		}
@@ -178,6 +188,17 @@ public final class ItemJson {
 		}
 
 		root.add("effects", effects);
+		if (item.shell() == Shell.BLOCK && item.blockTraits() != null) {
+			BlockTraits block = item.blockTraits();
+			JsonObject blockJson = new JsonObject();
+			blockJson.addProperty("trait", block.trait());
+			blockJson.addProperty("light_level", block.lightLevel());
+			blockJson.addProperty("friction", block.friction());
+			blockJson.addProperty("bounce", block.bounce());
+			blockJson.addProperty("hardness", block.hardness());
+			blockJson.addProperty("emits_particles", block.emitsParticles());
+			root.add("block_traits", blockJson);
+		}
 		root.add("palette", toArray(item.palette().toHexList()));
 		root.add("icon", toArray(item.icon().asList()));
 
@@ -240,21 +261,30 @@ public final class ItemJson {
 				if (effect.has("id")) {
 					effects.add(new ItemEffect(effect.get("id").getAsString(), intOf(effect, "ticks"), intOf(effect, "amplifier")));
 				}
+				}
 			}
-		}
 
-		return new GeneratedItem(
+			BlockTraits blockTraits = BlockTraits.DEFAULT;
+			if (root.has("block_traits") && root.get("block_traits").isJsonObject()) {
+				JsonObject block = root.getAsJsonObject("block_traits");
+				blockTraits = BlockTraits.from(block.has("trait") ? block.get("trait").getAsString() : "fortified",
+						intOf(block, "light_level"), floatOf(block, "friction"), floatOf(block, "bounce"),
+						floatOf(block, "hardness"), block.has("emits_particles") && block.get("emits_particles").getAsBoolean());
+			}
+
+			return new GeneratedItem(
 				root.get("item_id").getAsString(),
 				root.get("recipe_key").getAsString(),
 				root.get("name").getAsString(),
 				stringList(root, "lore"),
 				shell,
 				rarity,
-				new StatSet(floatOf(stats, "damage"), floatOf(stats, "attack_speed"), intOf(stats, "durability"),
-						floatOf(stats, "armor"), floatOf(stats, "armor_toughness"), floatOf(stats, "mining_speed"),
-						intOf(stats, "food"), floatOf(stats, "saturation"), floatOf(stats, "ability_power")),
-				effects,
-				palette,
+					new StatSet(floatOf(stats, "damage"), floatOf(stats, "attack_speed"), intOf(stats, "durability"),
+							floatOf(stats, "armor"), floatOf(stats, "armor_toughness"), floatOf(stats, "mining_speed"),
+							intOf(stats, "food"), floatOf(stats, "saturation"), floatOf(stats, "ability_power")),
+					effects,
+					blockTraits,
+					palette,
 				icon,
 				model,
 				root.has("lua") && root.get("lua").isJsonPrimitive() ? root.get("lua").getAsString() : null,
