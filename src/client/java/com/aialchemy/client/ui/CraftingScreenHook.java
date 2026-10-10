@@ -26,6 +26,12 @@ public final class CraftingScreenHook {
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (screen instanceof InventoryScreen || screen instanceof CraftingScreen) {
 				AiAlchemy.LOGGER.debug("AI Alchemy result-slot control active on {}", screen.getClass().getSimpleName());
+				ScreenEvents.remove(screen).register(removed -> {
+					if (pending && client.player != null) {
+						client.player.displayClientMessage(
+								Component.translatable("status.ai_alchemy.left_table"), true);
+					}
+				});
 			}
 		});
 	}
@@ -59,6 +65,10 @@ public final class CraftingScreenHook {
 
 		pending = true;
 		ClientPlayNetworking.send(new AlchemyPayloads.TransmuteRequest(false));
+		Minecraft client = Minecraft.getInstance();
+		if (client.player != null) {
+			client.player.displayClientMessage(Component.translatable("status.ai_alchemy.started"), true);
+		}
 	}
 
 	/** Handles the server's answer for the current screen. */

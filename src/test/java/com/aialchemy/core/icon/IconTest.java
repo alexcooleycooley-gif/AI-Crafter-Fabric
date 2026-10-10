@@ -49,7 +49,10 @@ class IconTest {
 	@Test
 	@DisplayName("a well formed icon passes and produces a decodable PNG")
 	void goodIconPasses() {
-		List<String> raw = rows("1");
+		List<String> raw = new ArrayList<>();
+		for (int y = 0; y < 16; y++) {
+			raw.add((y < 6 ? "1" : y < 11 ? "2" : "3").repeat(16));
+		}
 		Issue.Collector issues = IconValidator.validate(raw, PALETTE);
 		assertFalse(issues.hasErrors(), issues::errorSummary);
 

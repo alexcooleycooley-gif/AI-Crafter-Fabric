@@ -197,7 +197,7 @@ public final class TransmuteService {
 	/** Hands the item over, empties the grid and pushes the assets to clients. */
 	private void deliver(ServerPlayer player, CraftingGrid grid, GeneratedItem item, AlchemyPayloads.Status status) {
 		ItemStack stack = ItemFactory.create(item);
-		consumeGrid(player);
+		consumeGrid(player, grid);
 
 		if (!player.getInventory().add(stack)) {
 			player.drop(stack, false);
@@ -215,7 +215,13 @@ public final class TransmuteService {
 		respond(player, new AlchemyPayloads.TransmuteResult(status, item.name(), item.itemId(), ""));
 	}
 
-	private void consumeGrid(ServerPlayer player) {
+	private void consumeGrid(ServerPlayer player, CraftingGrid grid) {
+		if (grid.container() != null) {
+			grid.container().clearContent();
+			player.containerMenu.broadcastChanges();
+			return;
+		}
+
 		java.util.Set<net.minecraft.world.Container> cleared = java.util.Collections.newSetFromMap(
 				new java.util.IdentityHashMap<>());
 

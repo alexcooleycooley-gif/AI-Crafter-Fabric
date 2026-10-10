@@ -26,7 +26,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -61,6 +63,25 @@ public class AlchemyItem extends Item {
 			dispatch(ScriptHook.ON_USE, HookContext.use(serverPlayer, stack, serverLevel, hand));
 		}
 
+		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public InteractionResult useOn(UseOnContext context) {
+		if (this.shell != Shell.BLOCK) return super.useOn(context);
+		BlockPos placePos = context.getClickedPos().relative(context.getClickedFace());
+		if (!context.getLevel().getBlockState(placePos).canBeReplaced()) return InteractionResult.FAIL;
+		AlchemyData data = dataOf(context.getItemInHand());
+		int choice = Math.floorMod(data == null ? 0 : data.itemId().hashCode(), 5);
+		var block = switch (choice) {
+			case 0 -> Blocks.SEA_LANTERN;
+			case 1 -> Blocks.SLIME_BLOCK;
+			case 2 -> Blocks.HONEY_BLOCK;
+			case 3 -> Blocks.AMETHYST_BLOCK;
+			default -> Blocks.OBSIDIAN;
+		};
+		if (!context.getLevel().setBlock(placePos, block.defaultBlockState(), 3)) return InteractionResult.FAIL;
+		if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) context.getItemInHand().shrink(1);
 		return InteractionResult.SUCCESS;
 	}
 
@@ -127,7 +148,10 @@ public class AlchemyItem extends Item {
 			}
 
 			tooltip.accept(Component.empty());
-			tooltip.accept(Component.translatable("tooltip.ai_alchemy.tier", data.tier()).withStyle(ChatFormatting.DARK_AQUA));
+				tooltip.accept(Component.translatable("tooltip.ai_alchemy.tier", data.tier()).withStyle(ChatFormatting.DARK_AQUA));
+				if (this.shell == Shell.BLOCK) {
+					tooltip.accept(Component.literal("Trait: " + blockTrait(data.itemId())).withStyle(ChatFormatting.AQUA));
+				}
 
 			if (data.hasScript()) {
 				tooltip.accept(Component.translatable(state.scripts().isDisabled(data.scriptId())
@@ -138,7 +162,17 @@ public class AlchemyItem extends Item {
 
 		tooltip.accept(Component.translatable("tooltip.ai_alchemy.discoverer", data.discovererOrUnknown())
 				.withStyle(ChatFormatting.DARK_GRAY));
-	}
+		}
+
+		private static String blockTrait(String itemId) {
+			return switch (Math.floorMod(itemId.hashCode(), 5)) {
+				case 0 -> "luminous";
+				case 1 -> "bouncy";
+				case 2 -> "slippery";
+				case 3 -> "resonant";
+				default -> "fortified";
+			};
+		}
 
 	private void dispatch(ScriptHook hook, HookContext context) {
 		WorldAlchemyState state = AiAlchemy.state();

@@ -31,6 +31,7 @@ public final class ModItems {
 	public static final Item ALCHEMY_ARMOR_FEET = register(Shell.ARMOR_FEET);
 	public static final Item ALCHEMY_FOOD = register(Shell.FOOD);
 	public static final Item ALCHEMY_TRINKET = register(Shell.TRINKET);
+	public static final Item ALCHEMY_BLOCK = register(Shell.BLOCK);
 
 	public static void initialize() {
 		AiAlchemy.LOGGER.info("Registered {} AI Alchemy shell items", SHELLS.size());

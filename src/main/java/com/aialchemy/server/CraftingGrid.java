@@ -23,7 +23,7 @@ import net.minecraft.world.item.crafting.CraftingInput;
  * for both the player's 2x2 grid and a crafting table's 3x3 grid.</p>
  */
 public record CraftingGrid(List<Ingredient> ingredients, List<ItemStack> stacks, int width, int height,
-		boolean containsGeneratedItem, boolean empty) {
+		boolean containsGeneratedItem, boolean empty, CraftingContainer container) {
 
 	/** Reads the grid, or returns null when the player has no crafting menu open. */
 	public static CraftingGrid read(ServerPlayer player) {
@@ -80,10 +80,10 @@ public record CraftingGrid(List<Ingredient> ingredients, List<ItemStack> stacks,
 		}
 
 		if (total > 512) {
-			return new CraftingGrid(List.of(), List.of(), gridWidth, gridHeight, generated, true);
+			return new CraftingGrid(List.of(), List.of(), gridWidth, gridHeight, generated, true, container);
 		}
 
-		return new CraftingGrid(ingredients, stacks, gridWidth, gridHeight, generated, empty);
+		return new CraftingGrid(ingredients, stacks, gridWidth, gridHeight, generated, empty, container);
 	}
 
 	/** The {@link CraftingInput} view of the grid, used for the vanilla recipe lookup. */

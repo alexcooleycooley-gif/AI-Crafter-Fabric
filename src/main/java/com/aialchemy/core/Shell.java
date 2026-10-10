@@ -18,7 +18,8 @@ public enum Shell {
 	ARMOR_LEGS("armor_legs", "alchemy_armor_legs", true, true),
 	ARMOR_FEET("armor_feet", "alchemy_armor_feet", true, true),
 	FOOD("food", "alchemy_food", false, false),
-	TRINKET("trinket", "alchemy_trinket", false, false);
+	TRINKET("trinket", "alchemy_trinket", false, false),
+	BLOCK("block", "alchemy_block", false, false);
 
 	private final String jsonName;
 	private final String itemPath;

@@ -21,10 +21,10 @@ public final class ItemTransforms {
 	private static final ItemTransform GROUND = new ItemTransform(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 2f, 0f), new Vector3f(0.5f, 0.5f, 0.5f));
 	private static final ItemTransform FIXED = new ItemTransform(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 0f, 0f), new Vector3f(1f, 1f, 1f));
 	private static final ItemTransform HEAD = new ItemTransform(new Vector3f(0f, 180f, 0f), new Vector3f(0f, 13f, 7f), new Vector3f(1f, 1f, 1f));
-	private static final ItemTransform THIRD_RIGHT = new ItemTransform(new Vector3f(0f, -90f, 55f), new Vector3f(0f, 4f, 0.5f), new Vector3f(0.85f, 0.85f, 0.85f));
-	private static final ItemTransform THIRD_LEFT = new ItemTransform(new Vector3f(0f, 90f, -55f), new Vector3f(0f, 4f, 0.5f), new Vector3f(0.85f, 0.85f, 0.85f));
-	private static final ItemTransform FIRST_RIGHT = new ItemTransform(new Vector3f(0f, -90f, 25f), new Vector3f(1.13f, 3.2f, 1.13f), new Vector3f(0.68f, 0.68f, 0.68f));
-	private static final ItemTransform FIRST_LEFT = new ItemTransform(new Vector3f(0f, 90f, -25f), new Vector3f(-1.13f, 3.2f, 1.13f), new Vector3f(0.68f, 0.68f, 0.68f));
+	private static final ItemTransform THIRD_RIGHT = new ItemTransform(new Vector3f(0f, -90f, 55f), new Vector3f(0f, 4f, 0.5f), new Vector3f(0.62f, 0.62f, 0.62f));
+	private static final ItemTransform THIRD_LEFT = new ItemTransform(new Vector3f(0f, 90f, -55f), new Vector3f(0f, 4f, 0.5f), new Vector3f(0.62f, 0.62f, 0.62f));
+	private static final ItemTransform FIRST_RIGHT = new ItemTransform(new Vector3f(0f, -90f, 25f), new Vector3f(1.13f, 3.2f, 1.13f), new Vector3f(0.42f, 0.42f, 0.42f));
+	private static final ItemTransform FIRST_LEFT = new ItemTransform(new Vector3f(0f, 90f, -25f), new Vector3f(-1.13f, 3.2f, 1.13f), new Vector3f(0.42f, 0.42f, 0.42f));
 
 	/** The vanilla transform for a context, with the model's own scale folded in. */
 	public static ItemTransform forContext(ItemDisplayContext context, float scale) {

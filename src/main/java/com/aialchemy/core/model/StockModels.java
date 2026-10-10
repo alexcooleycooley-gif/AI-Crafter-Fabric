@@ -30,6 +30,7 @@ public final class StockModels {
 			case ARMOR_FEET -> armorFeet(palette);
 			case FOOD -> food(palette);
 			case TRINKET -> trinket(palette);
+			case BLOCK -> block(palette);
 		};
 	}
 
@@ -97,6 +98,14 @@ public final class StockModels {
 				part(6.5f, 9f, 6f, 9.5f, 13f, 10f, 2, palette),
 				part(7f, 13f, 7f, 9f, 15f, 9f, 3, palette));
 		return model(8f, 7f, 8f, parts, IdleEffect.NONE);
+	}
+
+	private static CuboidModel block(Palette palette) {
+		List<ModelPart> parts = List.of(
+				part(2f, 2f, 2f, 14f, 14f, 14f, 1, palette),
+				part(3f, 3f, 3f, 13f, 5f, 13f, 2, palette),
+				part(5f, 5f, 1.5f, 11f, 11f, 2.5f, 3, palette));
+		return model(8f, 8f, 8f, parts, IdleEffect.PULSE);
 	}
 
 	private static ModelPart part(float fromX, float fromY, float fromZ, float toX, float toY, float toZ, int color, Palette palette) {

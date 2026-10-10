@@ -55,12 +55,13 @@ public final class ProceduralIcon {
 			case ARMOR_CHEST -> x >= 3 && x <= 12 && y >= 3 && y <= 11;
 			case ARMOR_LEGS -> (x >= 2 && x <= 6 && y >= 3 && y <= 12) || (x >= 9 && x <= 13 && y >= 3 && y <= 12);
 			case ARMOR_FEET -> (x >= 2 && x <= 6 && y >= 7 && y <= 12) || (x >= 9 && x <= 13 && y >= 7 && y <= 12);
-			case TRINKET -> {
+				case TRINKET -> {
 				int dx = x - 8;
 				int dy = y - 8;
-				yield dx * dx + dy * dy <= 30;
-			}
-		};
+					yield dx * dx + dy * dy <= 30;
+				}
+				case BLOCK -> x >= 3 && x <= 12 && y >= 3 && y <= 12;
+			};
 	}
 
 	/** Mean colour of a set of ingredient average colours, used to seed a fallback palette. */

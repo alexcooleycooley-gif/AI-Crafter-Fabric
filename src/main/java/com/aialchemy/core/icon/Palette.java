@@ -127,6 +127,19 @@ public record Palette(List<Integer> colors) {
 			unique.add(0xFF9AA0A6);
 		}
 
+		// A single ingredient often supplies only one colour. Add deterministic dark and light
+		// variants so fallback icons are not rendered as flat one-colour blobs.
+		int source = unique.get(0);
+		while (unique.size() < Math.min(Math.max(targetSize, 3), MAX_COLORS)) {
+			int step = unique.size();
+			int r = Math.min(255, Math.max(0, ((source >>> 16) & 0xFF) + (step % 2 == 0 ? 42 : -42)));
+			int g = Math.min(255, Math.max(0, ((source >>> 8) & 0xFF) + (step % 2 == 0 ? 42 : -42)));
+			int b = Math.min(255, Math.max(0, (source & 0xFF) + (step % 2 == 0 ? 42 : -42)));
+			int variant = 0xFF000000 | (r << 16) | (g << 8) | b;
+			if (!unique.contains(variant)) unique.add(variant);
+			else break;
+		}
+
 		unique.add(0, 0x00000000);
 
 		if (unique.size() < 2) {

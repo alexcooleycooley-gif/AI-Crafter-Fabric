@@ -142,6 +142,8 @@ public final class PromptBuilder {
 					- armor_feet: boots, shoes, sandals, greaves or movement-focused footgear.
 					- food: stew, bread, fruit, confection, soup, ration or a strange edible preparation.
 					- trinket: ring, amulet, charm, mask, idol, lantern, compass, instrument or pocket relic.
+					- block: a placeable cube or rune block with one clear trait: luminous, bouncy, slippery,
+					  resonant or fortified. Give it a block-like silhouette and explain the trait in the lore.
 					If ingredients suggest protection (iron, diamond, netherite, leather, chain, wool, turtle,
 					gold or obsidian), strongly consider one of the four armour shells. If they suggest food,
 					choose food. If they suggest navigation, magic or redstone, consider a trinket. A wearable
@@ -340,8 +342,9 @@ Math.round(scriptLimits.effectRange()) + " block",
 			case WEAPON -> "swords, wands, staves, throwables (damage, attack speed, durability)";
 			case TOOL -> "pickaxe, axe, shovel or hoe style behaviour (mining speed, durability)";
 			case ARMOR_HEAD, ARMOR_CHEST, ARMOR_LEGS, ARMOR_FEET -> "wearable gear (armour, toughness, durability)";
-			case FOOD -> "consumables (food, saturation, effects)";
-			case TRINKET -> "right-click curios and passive items (ability power)";
+				case FOOD -> "consumables (food, saturation, effects)";
+				case TRINKET -> "right-click curios and passive items (ability power)";
+				case BLOCK -> "placeable trait blocks (luminous, bouncy, slippery, resonant or fortified)";
 		};
 	}
 

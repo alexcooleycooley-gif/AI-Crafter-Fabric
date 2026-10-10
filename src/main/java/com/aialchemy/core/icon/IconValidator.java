@@ -49,8 +49,9 @@ public final class IconValidator {
 			return collector;
 		}
 
-		boolean anyOpaque = false;
-		PixelIcon icon = new PixelIcon(rawIcon.toArray(new String[0]));
+			boolean anyOpaque = false;
+			java.util.Set<Integer> usedOpaqueColors = new java.util.HashSet<>();
+			PixelIcon icon = new PixelIcon(rawIcon.toArray(new String[0]));
 
 		for (int y = 0; y < PixelIcon.SIZE; y++) {
 			for (int x = 0; x < PixelIcon.SIZE; x++) {
@@ -61,15 +62,20 @@ public final class IconValidator {
 					return collector;
 				}
 
-				if ((palette.argb(index) >>> 24) != 0) {
-					anyOpaque = true;
-				}
+					if ((palette.argb(index) >>> 24) != 0) {
+						anyOpaque = true;
+						usedOpaqueColors.add(index);
+					}
 			}
 		}
 
-		if (!anyOpaque) {
-			collector.error("icon.empty", "icon is fully transparent");
-		}
+			if (!anyOpaque) {
+				collector.error("icon.empty", "icon is fully transparent");
+			}
+
+			if (usedOpaqueColors.size() < 3) {
+				collector.error("icon.too_flat", "icon must use at least 3 opaque palette colours for a readable silhouette");
+			}
 
 		return collector;
 	}
