@@ -1,0 +1,38 @@
+{
+	"item.ai_alchemy.alchemy_weapon": "Alchemised Weapon",
+	"item.ai_alchemy.alchemy_tool": "Alchemised Tool",
+	"item.ai_alchemy.alchemy_armor_head": "Alchemised Helm",
+	"item.ai_alchemy.alchemy_armor_chest": "Alchemised Chestplate",
+	"item.ai_alchemy.alchemy_armor_legs": "Alchemised Leggings",
+	"item.ai_alchemy.alchemy_armor_feet": "Alchemised Boots",
+	"item.ai_alchemy.alchemy_food": "Alchemised Food",
+	"item.ai_alchemy.alchemy_trinket": "Alchemised Trinket",
+
+	"button.ai_alchemy.transmute": "Transmute",
+	"button.ai_alchemy.transmute.tooltip": "Ask the AI to invent an item from what is in the grid",
+	"button.ai_alchemy.working": "Working...",
+
+	"status.ai_alchemy.empty_grid": "Put something in the crafting grid first",
+	"status.ai_alchemy.generated_ingredient": "Generated items cannot be used as ingredients",
+	"status.ai_alchemy.too_many": "That is too many ingredients for one transmutation",
+	"status.ai_alchemy.banned": "That combination has been disabled on this server",
+	"status.ai_alchemy.vanilla_recipe": "A normal crafting recipe already covers that combination",
+	"status.ai_alchemy.cooldown": "Wait a moment before transmuting again",
+	"status.ai_alchemy.daily_limit": "You have reached today's transmutation limit",
+	"status.ai_alchemy.already_pending": "A transmutation is already running for you",
+	"status.ai_alchemy.generating": "Asking the aether...",
+	"status.ai_alchemy.failed": "The transmutation fizzled out, the ingredients are safe",
+	"status.ai_alchemy.success": "Transmuted: %s",
+	"status.ai_alchemy.offline": "Crafted offline: %s",
+	"status.ai_alchemy.journal_loaded": "Journal loaded: %s recipes discovered",
+
+	"tooltip.ai_alchemy.unidentified": "Unidentified mixture",
+	"tooltip.ai_alchemy.tier": "Power tier %s",
+	"tooltip.ai_alchemy.script_active": "Enchanted behaviour active",
+	"tooltip.ai_alchemy.script_disabled": "Enchanted behaviour disabled",
+	"tooltip.ai_alchemy.discoverer": "Discovered by %s",
+
+	"command.ai_alchemy.journal_empty": "You have not discovered anything yet",
+	"command.ai_alchemy.journal_header": "Journal (%s entries)",
+	"command.ai_alchemy.not_generated": "Hold an alchemised item to inspect it"
+}

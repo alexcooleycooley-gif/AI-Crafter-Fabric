@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "ai_alchemy",
+	"version": "${version}",
+	"name": "AI Alchemy",
+	"description": "Place any items in a crafting grid and receive a brand new item invented by an AI model: generated name, lore, stats, icon, cuboid 3D model and sandboxed Lua behaviour. Generated items are pre-registered shell items whose identity lives in a data component, so a new item is usable the moment it is crafted.",
+	"authors": [
+		"AI Alchemy contributors"
+	],
+	"contact": {
+		"homepage": "https://github.com/alexcooleycooley-gif/AI-Crafter-Fabric",
+		"sources": "https://github.com/alexcooleycooley-gif/AI-Crafter-Fabric"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.aialchemy.AiAlchemy"
+		],
+		"client": [
+			"com.aialchemy.client.AiAlchemyClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
