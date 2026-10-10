@@ -127,9 +127,25 @@ public final class PromptBuilder {
 				  "effects": [{ "id": "minecraft:speed", "ticks": 100, "amplifier": 0 }]
 				}
 
-				## Shells
+					## Shells
 
-				%s
+					%s
+
+					## Archetype choices
+
+					Choose the shell that best fits the material story; do not default to weapon:
+					- weapon: blade, mace, hammer, wand, staff, spear, gauntlet or an unusual handheld arm.
+					- tool: pick, axe, shovel, hoe, sickle, chisel, compass or a specialist harvesting tool.
+					- armor_head: helmet, hood, mask, crown, goggles, circlet or creature-themed headpiece.
+					- armor_chest: cuirass, coat, robe, harness, mantle, shell or protective chest rig.
+					- armor_legs: greaves, leggings, trousers, kilt, skirt or articulated leg guards.
+					- armor_feet: boots, shoes, sandals, greaves or movement-focused footgear.
+					- food: stew, bread, fruit, confection, soup, ration or a strange edible preparation.
+					- trinket: ring, amulet, charm, mask, idol, lantern, compass, instrument or pocket relic.
+					If ingredients suggest protection (iron, diamond, netherite, leather, chain, wool, turtle,
+					gold or obsidian), strongly consider one of the four armour shells. If they suggest food,
+					choose food. If they suggest navigation, magic or redstone, consider a trinket. A wearable
+					item is a first-class result, not a fallback.
 
 				## Power tier %d
 
@@ -342,7 +358,39 @@ Math.round(scriptLimits.effectRange()) + " block",
 					+ " lore, icon silhouette, model silhouette and script all reinforce that same idea."
 					+ " Do not return a generic sword, pickaxe, armour piece or trinket unless the ingredients"
 					+ " clearly demand it, and do not copy the examples in the system prompt."
-					+ "\n\nRequired visual direction for this recipe: " + visualDirection(ingredientList) + ".";
+					+ "\n\nChoose deliberately from the archetype list: " + archetypeDirection(ingredientList) + "."
+					+ "\nRequired visual direction for this recipe: " + visualDirection(ingredientList) + ".";
+	}
+
+	private static String archetypeDirection(String ingredientList) {
+		String lower = ingredientList.toLowerCase(java.util.Locale.ROOT);
+		if (containsAny(lower, "iron", "diamond", "netherite", "leather", "chain", "wool", "turtle", "obsidian")) {
+			return switch (Math.floorMod(ingredientList.hashCode(), 4)) {
+				case 0 -> "armor_head, especially a mask, crown or visor";
+				case 1 -> "armor_chest, especially a coat, mantle or cuirass";
+				case 2 -> "armor_legs, especially articulated greaves or leggings";
+				default -> "armor_feet, especially boots with a movement theme";
+			};
+		}
+		if (containsAny(lower, "apple", "bread", "beef", "pork", "fish", "potato", "carrot", "sugar", "melon")) {
+			return "food, with a memorable preparation and one sensory detail";
+		}
+		if (containsAny(lower, "ender", "amethyst", "echo", "redstone", "prismarine", "quartz")) {
+			return "trinket, especially a charm, instrument, lantern or pocket relic";
+		}
+		return switch (Math.floorMod(ingredientList.hashCode(), 4)) {
+			case 0 -> "weapon, but not a default sword";
+			case 1 -> "tool, preferably a specialist tool rather than a generic pickaxe";
+			case 2 -> "trinket with a visible carried identity";
+			default -> "one of the four armor shells if the material story supports protection";
+		};
+	}
+
+	private static boolean containsAny(String value, String... terms) {
+		for (String term : terms) {
+			if (value.contains(term)) return true;
+		}
+		return false;
 	}
 
 	private static String visualDirection(String ingredientList) {
