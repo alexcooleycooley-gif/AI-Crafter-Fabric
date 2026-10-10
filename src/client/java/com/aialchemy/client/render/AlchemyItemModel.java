@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aialchemy.client.ClientAssets;
+import com.aialchemy.client.ClientSettings;
 import com.aialchemy.component.AlchemyData;
 import com.aialchemy.core.model.CuboidModel;
 import com.aialchemy.core.model.ModelPart;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -61,7 +63,7 @@ public final class AlchemyItemModel implements ItemModel {
 
 		// The layer applies the display transform, then hands off to the special renderer, which is
 		// exactly how vanilla's own special item models are structured.
-		layer.setupSpecialModel(AlchemySpecialModelRenderer.INSTANCE, argument(assets, data, context));
+		layer.setupSpecialModel(AlchemySpecialModelRenderer.INSTANCE, argument(assets, data, context, owner));
 		layer.setTransform(transform(assets, data, context));
 
 		if (stack.hasFoil()) {
@@ -76,12 +78,13 @@ public final class AlchemyItemModel implements ItemModel {
 		}
 	}
 
-	private static RenderArgument argument(ClientAssets assets, AlchemyData data, ItemDisplayContext context) {
+	private static RenderArgument argument(ClientAssets assets, AlchemyData data, ItemDisplayContext context,
+			ItemOwner owner) {
 		CuboidModel model = data.hasModel() ? assets.model(data.modelId()) : null;
 		int[] palette = paletteOf(model, data);
 		List<RenderArgument.PartGeometry> parts = new ArrayList<>();
 
-		if (model != null && context != ItemDisplayContext.GUI) {
+		if (model != null && context != ItemDisplayContext.GUI && withinRenderDistance(context, owner)) {
 			for (ModelPart part : model.parts()) {
 				parts.add(RenderArgument.PartGeometry.of(part, palette));
 			}
@@ -132,7 +135,33 @@ public final class AlchemyItemModel implements ItemModel {
 		return ItemTransforms.forContext(context, ItemTransforms.scaleForContext(context, hand, ground, frame));
 	}
 
-	private static Vector3fc[] extents(CuboidModel model) {
+	/**
+ * Distant dropped items draw their icon instead of their model: a busy market of generated items
+ * should not cost more to render than a chest of sticks. Close-ups (gui, item frames, heads) are
+ * always drawn as models.
+ */
+private static boolean withinRenderDistance(ItemDisplayContext context, ItemOwner owner) {
+if (context == ItemDisplayContext.GUI || context == ItemDisplayContext.FIXED
+|| context == ItemDisplayContext.HEAD || owner == null) {
+return true;
+}
+
+try {
+Minecraft client = Minecraft.getInstance();
+
+if (client.gameRenderer == null || client.gameRenderer.getMainCamera() == null) {
+return true;
+}
+
+double limit = ClientSettings.modelRenderDistance();
+net.minecraft.world.phys.Vec3 camera = client.gameRenderer.getMainCamera().position();
+return owner.position().distanceToSqr(camera.x, camera.y, camera.z) <= limit * limit;
+} catch (RuntimeException exception) {
+return true;
+}
+}
+
+private static Vector3fc[] extents(CuboidModel model) {
 		CuboidModel.Bounds bounds = model.bounds();
 		List<Vector3fc> points = new ArrayList<>(2);
 		points.add(new Vector3f(bounds.minX(), bounds.minY(), bounds.minZ()));

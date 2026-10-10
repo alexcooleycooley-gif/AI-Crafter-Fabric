@@ -99,7 +99,25 @@ public final class GenerationService {
 	private Outcome attempt(Request request) {
 		this.requests.incrementAndGet();
 		ValidationContext context = this.config.validationContext(request.tier());
-		PromptBuilder.Prompt prompt = PromptBuilder.fullPrompt(request.ingredientList(), request.tier(), context, this.config.scriptLimits());
+		PromptBuilder.Prompt prompt;
+
+		if (this.config.twoPassGeneration) {
+			// Two pass mode: commit to a concept first, then ask for the model, icon and script for that
+			// concept. Slower, and better at keeping the shape and the numbers consistent.
+			try {
+				String concept = this.provider
+						.complete(PromptBuilder.conceptPrompt(request.ingredientList(), request.tier(), context))
+						.join();
+				prompt = PromptBuilder.detailPrompt(concept, request.tier(), context, this.config.scriptLimits());
+			} catch (RuntimeException exception) {
+				Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+				AiAlchemy.LOGGER.warn("Concept pass failed for {}: {}", request.itemId(), cause.getMessage());
+				return new Outcome(null, "concept pass failed: " + cause.getMessage(), false);
+			}
+		} else {
+			prompt = PromptBuilder.fullPrompt(request.ingredientList(), request.tier(), context, this.config.scriptLimits());
+		}
+
 		String validationError = null;
 		int attempts = Math.max(0, this.config.retries) + 1;
 
