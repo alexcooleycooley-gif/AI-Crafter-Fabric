@@ -46,15 +46,16 @@ public final class AlchemyPayloads {
 	}
 
 	/** S2C: the outcome of a transmute attempt. */
-	public record TransmuteResult(Status status, String message, String itemId) implements CustomPacketPayload {
+	public record TransmuteResult(Status status, String message, String itemId, String detail) implements CustomPacketPayload {
 
 		public static final Identifier ID = AiAlchemy.id("transmute_result");
 		public static final Type<TransmuteResult> TYPE = new Type<>(ID);
 		public static final StreamCodec<RegistryFriendlyByteBuf, TransmuteResult> CODEC = StreamCodec.composite(
-				ByteBufCodecs.VAR_INT, payload -> payload.status().ordinal(),
-				ByteBufCodecs.STRING_UTF8, TransmuteResult::message,
-				ByteBufCodecs.STRING_UTF8, TransmuteResult::itemId,
-				(status, message, itemId) -> new TransmuteResult(Status.values()[status], message, itemId));
+					ByteBufCodecs.VAR_INT, payload -> payload.status().ordinal(),
+					ByteBufCodecs.STRING_UTF8, TransmuteResult::message,
+					ByteBufCodecs.STRING_UTF8, TransmuteResult::itemId,
+					ByteBufCodecs.stringUtf8(512), TransmuteResult::detail,
+					(status, message, itemId, detail) -> new TransmuteResult(Status.values()[status], message, itemId, detail));
 
 		@Override
 		public Type<? extends CustomPacketPayload> type() {

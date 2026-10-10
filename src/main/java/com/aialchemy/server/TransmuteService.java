@@ -136,21 +136,20 @@ public final class TransmuteService {
 			respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.RATE_LIMITED,
 					verdict == RateLimits.Verdict.COOLDOWN
 							? "status.ai_alchemy.cooldown"
-							: "status.ai_alchemy.daily_limit",
-					""));
+							: "status.ai_alchemy.daily_limit", "", ""));
 			return;
 		}
 
 		if (!this.pending.add(player.getUUID())) {
 			respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.PENDING,
-					"status.ai_alchemy.already_pending", ""));
+					"status.ai_alchemy.already_pending", "", ""));
 			return;
 		}
 
 		int tier = tierFor(grid.ingredients());
 		List<Integer> colors = ingredientColors(grid.stacks());
 		respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.PENDING,
-				"status.ai_alchemy.generating", itemId));
+				"status.ai_alchemy.generating", itemId, ""));
 
 		GenerationService.Request request = new GenerationService.Request(recipeKey, itemId,
 				promptIngredientList(grid.ingredients()), colors, tier, player.getGameProfile().name(),
@@ -173,8 +172,8 @@ public final class TransmuteService {
 					String reason = outcome != null ? outcome.error()
 							: (throwable == null ? "generation failed" : throwable.getMessage());
 					AiAlchemy.LOGGER.warn("Transmute failed for {}: {}", player.getGameProfile().name(), reason);
-					respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED,
-							"status.ai_alchemy.failed", ""));
+						respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED,
+								"status.ai_alchemy.failed", "", diagnostic(reason)));
 				}
 			});
 		});
@@ -213,7 +212,7 @@ public final class TransmuteService {
 		}
 
 		this.storage.saveIfDirty();
-		respond(player, new AlchemyPayloads.TransmuteResult(status, item.name(), item.itemId()));
+		respond(player, new AlchemyPayloads.TransmuteResult(status, item.name(), item.itemId(), ""));
 	}
 
 	private void consumeGrid(ServerPlayer player) {
@@ -225,7 +224,15 @@ public final class TransmuteService {
 	}
 
 	private void fail(ServerPlayer player, String messageKey) {
-		respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED, messageKey, ""));
+		respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED, messageKey, "", ""));
+	}
+
+	/** Keep provider diagnostics useful without sending a giant response or a secret to the client. */
+	private static String diagnostic(String reason) {
+		if (reason == null || reason.isBlank()) return "unknown server error";
+		String safe = reason.replaceAll("(?i)(api[_ -]?key|authorization|bearer)\\s*[:=]?\\s*\\S+", "$1=[redacted]")
+				.replaceAll("\\s+", " ").trim();
+		return safe.length() > 480 ? safe.substring(0, 480) + "..." : safe;
 	}
 
 	private void respond(ServerPlayer player, AlchemyPayloads.TransmuteResult result) {

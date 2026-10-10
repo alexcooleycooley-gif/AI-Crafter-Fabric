@@ -25,13 +25,14 @@ import net.minecraft.network.chat.Component;
  */
 public final class CraftingScreenHook {
 
-	private static final int BUTTON_WIDTH = 90;
+	private static final int BUTTON_WIDTH = 128;
 	private static final int BUTTON_HEIGHT = 20;
 
 	private CraftingScreenHook() {
 	}
 
 	private static Button lastButton;
+	private static boolean pending;
 
 	public static void register() {
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
@@ -41,13 +42,16 @@ public final class CraftingScreenHook {
 
 			// Placed relative to the screen centre, so it lands beside both the 2x2 inventory grid and
 			// the 3x3 crafting table without reaching into container screen internals.
-			int x = width / 2 + 88 - BUTTON_WIDTH - 4;
-			int y = height / 2 - 83 - BUTTON_HEIGHT - 3;
-			Button button = Button.builder(Component.translatable("button.ai_alchemy.transmute"), widget -> transmute())
-					.bounds(x, Math.max(2, y), BUTTON_WIDTH, BUTTON_HEIGHT)
-					.tooltip(Tooltip.create(Component.translatable("button.ai_alchemy.transmute.tooltip")))
-					.build();
-			lastButton = button;
+				// The old placement was relative to the top edge and could produce a button floating at
+				// y=2. Put it under the output slot instead: it is visible in both the 2x2 and 3x3 screens.
+				int x = width / 2 + 22;
+				int y = height / 2 + 20;
+				Button button = Button.builder(Component.translatable("button.ai_alchemy.transmute"), widget -> transmute())
+						.bounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+						.tooltip(Tooltip.create(Component.translatable("button.ai_alchemy.transmute.tooltip")))
+						.build();
+				lastButton = button;
+				button.active = !pending;
 			attach(screen, button);
 		});
 	}
@@ -62,13 +66,15 @@ public final class CraftingScreenHook {
 		}
 	}
 
-	private static void transmute() {
-		if (!ClientPlayNetworking.canSend(AlchemyPayloads.TransmuteRequest.TYPE)) {
-			return;
-		}
+		private static void transmute() {
+			if (pending || !ClientPlayNetworking.canSend(AlchemyPayloads.TransmuteRequest.TYPE)) {
+				return;
+			}
 
-		ClientPlayNetworking.send(new AlchemyPayloads.TransmuteRequest(false));
-		setButtonLabel(Component.translatable("button.ai_alchemy.working"));
+			pending = true;
+			ClientPlayNetworking.send(new AlchemyPayloads.TransmuteRequest(false));
+			setButtonLabel(Component.translatable("button.ai_alchemy.working"));
+			if (lastButton != null) lastButton.active = false;
 	}
 
 	/** Handles the server's answer for the current screen. */
@@ -76,18 +82,23 @@ public final class CraftingScreenHook {
 		Component message = describe(payload);
 		Minecraft client = Minecraft.getInstance();
 
-		if (client.player != null) {
-			client.player.displayClientMessage(message, true);
-		}
+			if (client.player != null) {
+				client.player.displayClientMessage(message, true);
+			}
 
-		setButtonLabel(message);
+			pending = payload.status() == AlchemyPayloads.Status.PENDING;
+			setButtonLabel(message);
+			if (lastButton != null) lastButton.active = !pending;
 	}
 
 	private static Component describe(AlchemyPayloads.TransmuteResult payload) {
 		return switch (payload.status()) {
 			case SUCCESS, CACHE_HIT -> Component.translatable("status.ai_alchemy.success", payload.message());
 			case OFFLINE -> Component.translatable("status.ai_alchemy.offline", payload.message());
-			case PENDING, RATE_LIMITED, FAILED -> Component.translatable(payload.message());
+				case PENDING, RATE_LIMITED -> Component.translatable(payload.message());
+				case FAILED -> payload.detail() == null || payload.detail().isBlank()
+						? Component.translatable(payload.message())
+						: Component.translatable("status.ai_alchemy.failed_detail", payload.detail());
 		};
 	}
 

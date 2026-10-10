@@ -148,10 +148,13 @@ public final class PromptBuilder {
 
 				- The palette holds at most 16 colours, written as #RRGGBB or #AARRGGBB.
 				- Index 0 should be transparent (#00000000) and is the background of the icon.
-				- The icon is exactly 16 rows of exactly 16 characters. Each character is one hex digit:
-				  the palette index of that pixel. Draw a readable silhouette, not noise.
-				- The same palette colours the icon and the model, so the item looks coherent in the
-				  inventory and in the world.
+					- The icon is exactly 16 rows of exactly 16 characters. Each character is one hex digit:
+					  the palette index of that pixel. Draw a readable silhouette, not noise.
+					- Use a transparent background and a bold 3-5 colour silhouette with a clear focal detail.
+					  Fill at least 25% of the canvas, use deliberate symmetry or a deliberate asymmetry, and
+					  never make a random checkerboard or a plain coloured square.
+					- The same palette colours the icon and the model, so the item looks coherent in the
+					  inventory and in the world.
 
 				## Cuboid model
 
@@ -164,9 +167,10 @@ public final class PromptBuilder {
 				- Optional "emissive": true. At most %s%% of the parts may be emissive in this tier.
 				- Optional "idle_effect": %s.
 				- "display" scales are clamped to %s .. %s.
-				- The grip point must lie inside the model's bounding box.
-				- Design rules: one recognisable shape, grip near the bottom, silhouette readable at a
-				  glance. A pile of unrelated boxes is a failure, not a style.
+					- The grip point must lie inside the model's bounding box.
+					- Design rules: one recognisable shape, grip near the bottom, silhouette readable at a
+					  glance. Use 4-10 purposeful parts with a main body, a distinctive feature and a small
+					  accent where appropriate. A pile of unrelated boxes is a failure, not a style.
 
 				## Lua script
 
@@ -261,10 +265,16 @@ public final class PromptBuilder {
 				  "lua": "function on_hit(attacker, target)\\n  world.spawn_particles('minecraft:electric_spark', target.pos(), 12)\\n  target.add_effect('minecraft:glowing', 100, 0)\\nend"
 				}
 
-				## Final rules
+					## Final rules
 
-				- Answer with JSON only, no commentary.
-				- Never invent registry names: use only the ids listed above for effects, sounds,
+					- Answer with JSON only, no commentary.
+					- Do not copy the worked examples, their names, their icon layouts, or their lore.
+					- Avoid generic names such as "Mystic Blade", "Ancient Staff", "Elemental Tool",
+					  "Enchanted Weapon", "Power Amulet" or "Alchemised <item>". Use a concrete, memorable
+					  two-to-four word name tied to the ingredients and the item's one signature mechanic.
+					- The item must have one clear signature mechanic expressed consistently in its lore, model,
+					  effects and Lua hook. Prefer an unusual interaction over simply adding damage.
+					- Never invent registry names: use only the ids listed above for effects, sounds,
 				  particles and projectiles.
 				- Never write Java, never write file or network code, never use a name that is not in the
 				  Lua API above.
@@ -324,9 +334,13 @@ Math.round(scriptLimits.effectRange()) + " block",
 	}
 
 	/** The user message: ids, rarity and the computed tier, never display names. */
-	public static String ingredientUserPrompt(String ingredientList, int tier) {
-		return "Ingredients (id, count, rarity):\n" + ingredientList
-				+ "\n\nComputed power tier: " + tier
-				+ "\nInvent one item that could be made from exactly these ingredients.";
-	}
+		public static String ingredientUserPrompt(String ingredientList, int tier) {
+			return "Ingredients (id, count, rarity):\n" + ingredientList
+					+ "\n\nComputed power tier: " + tier
+					+ "\nInvent one item that could be made from exactly these ingredients."
+					+ "\nFirst identify the material story and one signature mechanic; then make the name,"
+					+ " lore, icon silhouette, model silhouette and script all reinforce that same idea."
+					+ " Do not return a generic sword, pickaxe, armour piece or trinket unless the ingredients"
+					+ " clearly demand it, and do not copy the examples in the system prompt.";
+		}
 }
