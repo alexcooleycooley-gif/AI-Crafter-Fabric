@@ -138,6 +138,15 @@ public final class AlchemyConfig {
 		return config;
 	}
 
+	/** Creates the operator config before a world is opened or a transmute is pressed. */
+	public static void ensureExists() {
+		Path path = FabricLoader.getInstance().getConfigDir().resolve("ai_alchemy.json");
+
+		if (!Files.exists(path)) {
+			new AlchemyConfig().save(path);
+		}
+	}
+
 	public void save(Path path) {
 		JsonObject root = new JsonObject();
 		root.addProperty("ai_provider", this.aiProvider);

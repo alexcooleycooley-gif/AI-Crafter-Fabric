@@ -58,14 +58,14 @@ public final class AlchemySpecialModelRenderer implements SpecialModelRenderer<R
 		if (context == ItemDisplayContext.GUI || argument.parts().isEmpty()) {
 			Identifier texture = AlchemyData.iconTexture(argument.iconId());
 			collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(texture),
-					(entry, consumer) -> drawFlatIcon(entry, consumer, light));
+					(entry, consumer) -> drawFlatIcon(entry, consumer, light, overlay));
 			return;
 		}
 
 		Identifier white = AlchemyData.whiteTexture();
 		Draw draw = new Draw(white, argument, animationAngle(argument));
 		collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(white),
-				(entry, consumer) -> drawCuboids(entry, consumer, light, draw));
+				(entry, consumer) -> drawCuboids(entry, consumer, light, overlay, draw));
 	}
 
 	@Override
@@ -82,35 +82,36 @@ public final class AlchemySpecialModelRenderer implements SpecialModelRenderer<R
 
 	// Icon -----------------------------------------------------------------
 
-	private static void drawFlatIcon(PoseStack.Pose pose, VertexConsumer consumer, int light) {
-		iconQuad(pose, consumer, 8.5f, false, light);
-		iconQuad(pose, consumer, 7.5f, true, light);
+	private static void drawFlatIcon(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay) {
+		iconQuad(pose, consumer, 8.5f, false, light, overlay);
+		iconQuad(pose, consumer, 7.5f, true, light, overlay);
 	}
 
-	private static void iconQuad(PoseStack.Pose pose, VertexConsumer consumer, float z, boolean back, int light) {
+	private static void iconQuad(PoseStack.Pose pose, VertexConsumer consumer, float z, boolean back, int light,
+			int overlay) {
 		int rgb = 0xFFFFFF;
 		int alpha = 0xFF;
 		float u0 = back ? 1f : 0f;
 		float u1 = back ? 0f : 1f;
 		float normal = back ? -1f : 1f;
 
-		vertex(pose, consumer, 0f, 0f, z, u0, 0f, rgb, alpha, light, 0f, 0f, normal);
-		vertex(pose, consumer, 16f, 0f, z, u1, 0f, rgb, alpha, light, 0f, 0f, normal);
-		vertex(pose, consumer, 16f, 16f, z, u1, 1f, rgb, alpha, light, 0f, 0f, normal);
-		vertex(pose, consumer, 0f, 16f, z, u0, 1f, rgb, alpha, light, 0f, 0f, normal);
+			vertex(pose, consumer, 0f, 0f, z, u0, 0f, rgb, alpha, light, overlay, 0f, 0f, normal);
+			vertex(pose, consumer, 16f, 0f, z, u1, 0f, rgb, alpha, light, overlay, 0f, 0f, normal);
+			vertex(pose, consumer, 16f, 16f, z, u1, 1f, rgb, alpha, light, overlay, 0f, 0f, normal);
+			vertex(pose, consumer, 0f, 16f, z, u0, 1f, rgb, alpha, light, overlay, 0f, 0f, normal);
 	}
 
 	// Cuboids --------------------------------------------------------------
 
-	private static void drawCuboids(PoseStack.Pose pose, VertexConsumer consumer, int light, Draw draw) {
-		for (RenderArgument.PartGeometry part : draw.argument.parts()) {
-			int partLight = part.emissive() ? LightTexture.FULL_BRIGHT : light;
-			drawBox(pose, consumer, part, partLight, draw);
+		private static void drawCuboids(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, Draw draw) {
+			for (RenderArgument.PartGeometry part : draw.argument.parts()) {
+				int partLight = part.emissive() ? LightTexture.FULL_BRIGHT : light;
+				drawBox(pose, consumer, part, partLight, overlay, draw);
+			}
 		}
-	}
 
-	private static void drawBox(PoseStack.Pose pose, VertexConsumer consumer, RenderArgument.PartGeometry part,
-			int light, Draw draw) {
+		private static void drawBox(PoseStack.Pose pose, VertexConsumer consumer, RenderArgument.PartGeometry part,
+				int light, int overlay, Draw draw) {
 		float minX = part.minX();
 		float minY = part.minY();
 		float minZ = part.minZ();
@@ -122,17 +123,17 @@ public final class AlchemySpecialModelRenderer implements SpecialModelRenderer<R
 
 		// Down, Up, North, South, West, East, matching vanilla's winding and shading.
 		face(pose, consumer, draw, minX, minY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, minX, minY, minZ,
-				rgb, alpha, SHADE_DOWN, 0f, -1f, 0f, light);
+					rgb, alpha, SHADE_DOWN, 0f, -1f, 0f, light, overlay);
 		face(pose, consumer, draw, minX, maxY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ, minX, maxY, maxZ,
-				rgb, alpha, SHADE_UP, 0f, 1f, 0f, light);
+					rgb, alpha, SHADE_UP, 0f, 1f, 0f, light, overlay);
 		face(pose, consumer, draw, maxX, minY, minZ, minX, minY, minZ, minX, maxY, minZ, maxX, maxY, minZ,
-				rgb, alpha, SHADE_NORTH, 0f, 0f, -1f, light);
+					rgb, alpha, SHADE_NORTH, 0f, 0f, -1f, light, overlay);
 		face(pose, consumer, draw, minX, minY, maxZ, maxX, minY, maxZ, maxX, maxY, maxZ, minX, maxY, maxZ,
-				rgb, alpha, SHADE_SOUTH, 0f, 0f, 1f, light);
+					rgb, alpha, SHADE_SOUTH, 0f, 0f, 1f, light, overlay);
 		face(pose, consumer, draw, minX, minY, minZ, minX, minY, maxZ, minX, maxY, maxZ, minX, maxY, minZ,
-				rgb, alpha, SHADE_WEST, -1f, 0f, 0f, light);
+					rgb, alpha, SHADE_WEST, -1f, 0f, 0f, light, overlay);
 		face(pose, consumer, draw, maxX, minY, maxZ, maxX, minY, minZ, maxX, maxY, minZ, maxX, maxY, maxZ,
-				rgb, alpha, SHADE_EAST, 1f, 0f, 0f, light);
+					rgb, alpha, SHADE_EAST, 1f, 0f, 0f, light, overlay);
 	}
 
 	private static void face(PoseStack.Pose pose, VertexConsumer consumer, Draw draw,
@@ -140,29 +141,31 @@ public final class AlchemySpecialModelRenderer implements SpecialModelRenderer<R
 			float x1, float y1, float z1,
 			float x2, float y2, float z2,
 			float x3, float y3, float z3,
-			int rgb, int alpha, float shade, float nx, float ny, float nz, int light) {
+				int rgb, int alpha, float shade, float nx, float ny, float nz, int light, int overlay) {
 		int color = shade(rgb, shade);
 		// A small UV square inside the shared white texture: the colour comes from the vertex.
-		quadVertex(pose, consumer, draw, x0, y0, z0, 0.25f, 0.25f, color, alpha, light, nx, ny, nz);
-		quadVertex(pose, consumer, draw, x1, y1, z1, 0.75f, 0.25f, color, alpha, light, nx, ny, nz);
-		quadVertex(pose, consumer, draw, x2, y2, z2, 0.75f, 0.75f, color, alpha, light, nx, ny, nz);
-		quadVertex(pose, consumer, draw, x3, y3, z3, 0.25f, 0.75f, color, alpha, light, nx, ny, nz);
+			quadVertex(pose, consumer, draw, x0, y0, z0, 0.25f, 0.25f, color, alpha, light, overlay, nx, ny, nz);
+			quadVertex(pose, consumer, draw, x1, y1, z1, 0.75f, 0.25f, color, alpha, light, overlay, nx, ny, nz);
+			quadVertex(pose, consumer, draw, x2, y2, z2, 0.75f, 0.75f, color, alpha, light, overlay, nx, ny, nz);
+			quadVertex(pose, consumer, draw, x3, y3, z3, 0.25f, 0.75f, color, alpha, light, overlay, nx, ny, nz);
 	}
 
 	private static void quadVertex(PoseStack.Pose pose, VertexConsumer consumer, Draw draw,
-			float x, float y, float z, float u, float v, int rgb, int alpha, int light, float nx, float ny, float nz) {
-		float[] position = draw.position(x, y, z);
-		float[] normal = draw.normal(nx, ny, nz);
-		vertex(pose, consumer, position[0], position[1], position[2], u, v, rgb, alpha, light,
-				normal[0], normal[1], normal[2]);
+			float x, float y, float z, float u, float v, int rgb, int alpha, int light, int overlay,
+			float nx, float ny, float nz) {
+			float[] position = draw.position(x, y, z);
+			float[] normal = draw.normal(nx, ny, nz);
+			vertex(pose, consumer, position[0], position[1], position[2], u, v, rgb, alpha, light,
+					overlay, normal[0], normal[1], normal[2]);
 	}
 
 	private static void vertex(PoseStack.Pose pose, VertexConsumer consumer, float x, float y, float z,
-			float u, float v, int rgb, int alpha, int light, float nx, float ny, float nz) {
+			float u, float v, int rgb, int alpha, int light, int overlay, float nx, float ny, float nz) {
 		consumer.addVertex(pose, x, y, z)
-				.setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha)
-				.setUv(u, v)
-				.setLight(light)
+					.setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha)
+					.setUv(u, v)
+					.setOverlay(overlay)
+					.setLight(light)
 				.setNormal(pose, nx, ny, nz);
 	}
 

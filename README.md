@@ -53,7 +53,7 @@ resource pack is needed, because generated assets travel over the network.
 ## Installation
 
 1. Put `ai-alchemy-<version>.jar` and Fabric API into `mods/` on the server and on every client.
-2. Start the server once: `config/ai-alchemy.json` is created.
+2. Start the server once: `config/ai_alchemy.json` is created.
 3. Set `endpoint`, `apiKey` and `model`, then restart the server.
 
 ```json
@@ -102,7 +102,7 @@ recommended way to share a curated set of items between servers: copy it in and 
 
 ## Configuration
 
-`config/ai-alchemy.json`, re-read at server start:
+`config/ai_alchemy.json`, re-read at server start:
 
 | Key | Default | Meaning |
 | --- | --- | --- |

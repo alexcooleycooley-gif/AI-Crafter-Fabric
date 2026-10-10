@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aialchemy.component.ModComponents;
+import com.aialchemy.config.AlchemyConfig;
 import com.aialchemy.item.ModItems;
 import com.aialchemy.network.AlchemyNetworking;
 import com.aialchemy.server.AlchemyCommands;
@@ -30,6 +31,7 @@ public class AiAlchemy implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		AlchemyConfig.ensureExists();
 		ModComponents.initialize();
 		ModItems.initialize();
 		AlchemyNetworking.registerPayloads();
