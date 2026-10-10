@@ -51,7 +51,7 @@ public record CraftingGrid(List<Ingredient> ingredients, List<ItemStack> stacks,
 			return null;
 		}
 
-		for (int index = 1; index < container.getContainerSize() && index <= gridWidth * gridHeight; index++) {
+		for (int index = 0; index < container.getContainerSize() && index < gridWidth * gridHeight; index++) {
 			inputs.add(container.getItem(index));
 		}
 

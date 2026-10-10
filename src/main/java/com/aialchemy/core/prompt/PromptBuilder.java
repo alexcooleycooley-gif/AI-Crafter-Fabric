@@ -334,13 +334,26 @@ Math.round(scriptLimits.effectRange()) + " block",
 	}
 
 	/** The user message: ids, rarity and the computed tier, never display names. */
-		public static String ingredientUserPrompt(String ingredientList, int tier) {
-			return "Ingredients (id, count, rarity):\n" + ingredientList
+	public static String ingredientUserPrompt(String ingredientList, int tier) {
+		return "Ingredients (id, count, rarity):\n" + ingredientList
 					+ "\n\nComputed power tier: " + tier
 					+ "\nInvent one item that could be made from exactly these ingredients."
 					+ "\nFirst identify the material story and one signature mechanic; then make the name,"
 					+ " lore, icon silhouette, model silhouette and script all reinforce that same idea."
 					+ " Do not return a generic sword, pickaxe, armour piece or trinket unless the ingredients"
-					+ " clearly demand it, and do not copy the examples in the system prompt.";
-		}
+					+ " clearly demand it, and do not copy the examples in the system prompt."
+					+ "\n\nRequired visual direction for this recipe: " + visualDirection(ingredientList) + ".";
+	}
+
+	private static String visualDirection(String ingredientList) {
+		String[] directions = {
+				"use a crescent or hook silhouette with one asymmetrical focal detail",
+				"use a compact core with a ring, halo or orbiting accent",
+				"use a long segmented silhouette with a visibly different tip",
+				"use a forked, branching or split silhouette rather than a straight blade",
+				"use a broad central body with a small suspended or inset gem-like detail",
+				"use a coiled, layered or wrapped silhouette with strong diagonal movement"
+		};
+		return directions[Math.floorMod(ingredientList.hashCode(), directions.length)];
+	}
 }

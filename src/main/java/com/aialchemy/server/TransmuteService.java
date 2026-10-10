@@ -216,11 +216,16 @@ public final class TransmuteService {
 	}
 
 	private void consumeGrid(ServerPlayer player) {
+		java.util.Set<net.minecraft.world.Container> cleared = java.util.Collections.newSetFromMap(
+				new java.util.IdentityHashMap<>());
+
 		for (net.minecraft.world.inventory.Slot slot : player.containerMenu.slots) {
-			if (slot.container instanceof net.minecraft.world.inventory.CraftingContainer) {
-				slot.set(ItemStack.EMPTY);
+			if (slot.container instanceof net.minecraft.world.inventory.CraftingContainer container && cleared.add(container)) {
+				container.clearContent();
 			}
 		}
+
+		player.containerMenu.broadcastChanges();
 	}
 
 	private void fail(ServerPlayer player, String messageKey) {
