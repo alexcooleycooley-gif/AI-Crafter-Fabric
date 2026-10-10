@@ -14,6 +14,7 @@ import com.aialchemy.core.RecipeKey;
 import com.aialchemy.core.icon.ProceduralIcon;
 import com.aialchemy.generation.GenerationService;
 import com.aialchemy.item.ItemFactory;
+import com.aialchemy.item.ModItems;
 import com.aialchemy.network.AlchemyNetworking;
 import com.aialchemy.network.AlchemyPayloads;
 import com.aialchemy.script.ScriptRuntime;
@@ -148,6 +149,7 @@ public final class TransmuteService {
 
 		int tier = tierFor(grid.ingredients());
 		List<Integer> colors = ingredientColors(grid.stacks());
+		addPendingToken(player);
 		respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.PENDING,
 				"status.ai_alchemy.generating", itemId, ""));
 
@@ -168,8 +170,9 @@ public final class TransmuteService {
 					this.storage.store(outcome.item());
 					this.storage.saveIfDirty();
 					deliver(player, grid, outcome.item(), AlchemyPayloads.Status.SUCCESS);
-				} else {
-					String reason = outcome != null ? outcome.error()
+					} else {
+						removePendingToken(player);
+						String reason = outcome != null ? outcome.error()
 							: (throwable == null ? "generation failed" : throwable.getMessage());
 					AiAlchemy.LOGGER.warn("Transmute failed for {}: {}", player.getGameProfile().name(), reason);
 						respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED,
@@ -197,6 +200,7 @@ public final class TransmuteService {
 	/** Hands the item over, empties the grid and pushes the assets to clients. */
 	private void deliver(ServerPlayer player, CraftingGrid grid, GeneratedItem item, AlchemyPayloads.Status status) {
 		ItemStack stack = ItemFactory.create(item);
+		removePendingToken(player);
 		consumeGrid(player, grid);
 
 		if (!player.getInventory().add(stack)) {
@@ -235,7 +239,26 @@ public final class TransmuteService {
 	}
 
 	private void fail(ServerPlayer player, String messageKey) {
+		removePendingToken(player);
 		respond(player, new AlchemyPayloads.TransmuteResult(AlchemyPayloads.Status.FAILED, messageKey, "", ""));
+	}
+
+	private void addPendingToken(ServerPlayer player) {
+		ItemStack token = new ItemStack(ModItems.ALCHEMY_UNKNOWN);
+		token.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,
+				 net.minecraft.network.chat.Component.translatable("item.ai_alchemy.unknown"));
+		if (!player.getInventory().add(token)) player.drop(token, false);
+		player.containerMenu.broadcastChanges();
+	}
+
+	private void removePendingToken(ServerPlayer player) {
+		for (int index = 0; index < player.getInventory().getContainerSize(); index++) {
+			if (player.getInventory().getItem(index).is(ModItems.ALCHEMY_UNKNOWN)) {
+				player.getInventory().setItem(index, ItemStack.EMPTY);
+				break;
+			}
+		}
+		player.containerMenu.broadcastChanges();
 	}
 
 	/** Keep provider diagnostics useful without sending a giant response or a secret to the client. */

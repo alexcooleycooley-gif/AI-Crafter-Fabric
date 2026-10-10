@@ -8,6 +8,7 @@
 	"item.ai_alchemy.alchemy_food": "Alchemised Food",
 		"item.ai_alchemy.alchemy_trinket": "Alchemised Trinket",
 		"item.ai_alchemy.alchemy_block": "Alchemised Block",
+		"item.ai_alchemy.alchemy_unknown": "Unknown Transmutation",
 
 		"button.ai_alchemy.transmute": "Transmute",
 		"button.ai_alchemy.transmute.tooltip": "Ask the AI to invent an item from what is in the grid",

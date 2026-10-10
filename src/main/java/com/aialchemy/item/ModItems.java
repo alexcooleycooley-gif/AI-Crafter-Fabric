@@ -32,6 +32,7 @@ public final class ModItems {
 	public static final Item ALCHEMY_FOOD = register(Shell.FOOD);
 	public static final Item ALCHEMY_TRINKET = register(Shell.TRINKET);
 	public static final Item ALCHEMY_BLOCK = register(Shell.BLOCK);
+	public static final Item ALCHEMY_UNKNOWN = registerUnknown();
 
 	public static void initialize() {
 		AiAlchemy.LOGGER.info("Registered {} AI Alchemy shell items", SHELLS.size());
@@ -47,5 +48,11 @@ public final class ModItems {
 		Item registered = Registry.register(BuiltInRegistries.ITEM, key, item);
 		SHELLS.put(shell, registered);
 		return registered;
+	}
+
+	private static Item registerUnknown() {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, AiAlchemy.id("alchemy_unknown"));
+		Item item = new Item(new Item.Properties().setId(key).stacksTo(1));
+		return Registry.register(BuiltInRegistries.ITEM, key, item);
 	}
 }
