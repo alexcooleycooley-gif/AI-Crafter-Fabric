@@ -151,7 +151,7 @@ public final class PromptBuilder {
 					- The icon is exactly 16 rows of exactly 16 characters. Each character is one hex digit:
 					  the palette index of that pixel. Draw a readable silhouette, not noise.
 					- Use a transparent background and a bold 3-5 colour silhouette with a clear focal detail.
-					  Fill at least 25% of the canvas, use deliberate symmetry or a deliberate asymmetry, and
+					  Fill at least 25%% of the canvas, use deliberate symmetry or a deliberate asymmetry, and
 					  never make a random checkerboard or a plain coloured square.
 					- The same palette colours the icon and the model, so the item looks coherent in the
 					  inventory and in the world.

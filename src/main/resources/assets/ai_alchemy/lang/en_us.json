@@ -8,8 +8,9 @@
 	"item.ai_alchemy.alchemy_food": "Alchemised Food",
 	"item.ai_alchemy.alchemy_trinket": "Alchemised Trinket",
 
-	"button.ai_alchemy.transmute": "Transmute",
-	"button.ai_alchemy.transmute.tooltip": "Ask the AI to invent an item from what is in the grid",
+		"button.ai_alchemy.transmute": "Transmute",
+		"button.ai_alchemy.transmute.tooltip": "Ask the AI to invent an item from what is in the grid",
+		"button.ai_alchemy.result_slot.tooltip": "Click to transmute the ingredients",
 	"button.ai_alchemy.working": "Working...",
 
 	"status.ai_alchemy.empty_grid": "Put something in the crafting grid first",
