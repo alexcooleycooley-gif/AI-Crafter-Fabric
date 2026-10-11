@@ -108,6 +108,7 @@ recommended way to share a curated set of items between servers: copy it in and 
 | --- | --- | --- |
 | `aiProvider` | `hosted` | `hosted` uses `endpoint`; `offline` and `mock` never touch the network |
 | `endpoint`, `apiKey`, `model` | — | OpenAI compatible chat completions endpoint |
+| `max_tokens` | `8192` | Maximum completion tokens for one generated item |
 | `requestTimeoutSeconds` | `45` | Per request timeout |
 | `retries` | `2` | Retries when validation rejects an answer |
 | `powerCap` | `1.0` | Scales every tier threshold; lower it on a survival server |
