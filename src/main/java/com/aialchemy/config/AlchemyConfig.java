@@ -36,6 +36,8 @@ public final class AlchemyConfig {
 	public String apiKey = "";
 	/** Model name sent to OpenAI compatible endpoints. */
 	public String model = "gpt-4o-mini";
+	/** Maximum number of tokens the provider may use for one generated item. */
+	public int maxTokens = 8_192;
 	/** Request timeout in seconds. */
 	public int requestTimeoutSeconds = 45;
 	/** Number of retries before the fallback ladder gives up. */
@@ -102,6 +104,7 @@ public final class AlchemyConfig {
 			config.endpoint = string(root, "endpoint", config.endpoint);
 			config.apiKey = string(root, "api_key", config.apiKey);
 			config.model = string(root, "model", config.model);
+			config.maxTokens = integer(root, "max_tokens", config.maxTokens);
 			config.requestTimeoutSeconds = integer(root, "request_timeout_s", config.requestTimeoutSeconds);
 			config.retries = integer(root, "retries", config.retries);
 			config.powerCap = decimal(root, "power_cap", config.powerCap);
@@ -153,6 +156,7 @@ public final class AlchemyConfig {
 		root.addProperty("endpoint", this.endpoint);
 		root.addProperty("api_key", this.apiKey);
 		root.addProperty("model", this.model);
+		root.addProperty("max_tokens", this.maxTokens);
 		root.addProperty("request_timeout_s", this.requestTimeoutSeconds);
 		root.addProperty("retries", this.retries);
 		root.addProperty("power_cap", this.powerCap);

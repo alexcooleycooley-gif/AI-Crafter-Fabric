@@ -26,12 +26,14 @@ public final class HttpAiProvider implements AiProvider {
 	private final String endpoint;
 	private final String apiKey;
 	private final String model;
+	private final int maxTokens;
 	private final Duration timeout;
 
 	public HttpAiProvider(AlchemyConfig config) {
 		this.endpoint = config.endpoint;
 		this.apiKey = config.apiKey;
 		this.model = config.model;
+		this.maxTokens = Math.max(0, config.maxTokens);
 		this.timeout = Duration.ofSeconds(Math.max(5, config.requestTimeoutSeconds));
 		this.client = HttpClient.newBuilder()
 				.connectTimeout(Duration.ofSeconds(10))
@@ -53,6 +55,9 @@ public final class HttpAiProvider implements AiProvider {
 	public CompletableFuture<String> complete(PromptBuilder.Prompt prompt) {
 		JsonObject body = new JsonObject();
 		body.addProperty("model", this.model);
+		if (this.maxTokens > 0) {
+			body.addProperty("max_tokens", this.maxTokens);
+		}
 		body.addProperty("temperature", 0.9D);
 
 		JsonArray messages = new JsonArray();
@@ -82,11 +87,15 @@ public final class HttpAiProvider implements AiProvider {
 						throw new IllegalStateException("provider returned HTTP " + response.statusCode());
 					}
 
-					return extractContent(response.body());
-				});
+						return extractContent(response.body(), this.maxTokens);
+					});
 	}
 
 	static String extractContent(String responseBody) {
+		return extractContent(responseBody, 0);
+	}
+
+	private static String extractContent(String responseBody, int maxTokens) {
 		JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
 
 		if (!root.has("choices")) {
@@ -100,6 +109,10 @@ public final class HttpAiProvider implements AiProvider {
 		}
 
 		JsonObject first = choices.get(0).getAsJsonObject();
+		if (first.has("finish_reason") && "length".equals(first.get("finish_reason").getAsString())) {
+			String limit = maxTokens > 0 ? " at max_tokens=" + maxTokens : "";
+			throw new IllegalStateException("provider truncated response" + limit);
+		}
 
 		if (!first.has("message")) {
 			throw new IllegalStateException("provider response had no message");

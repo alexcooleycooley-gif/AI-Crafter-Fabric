@@ -162,6 +162,11 @@ all of the above.
 
 ## Testing strategy
 
+The hosted chat-completions request explicitly sets `max_tokens` to 8192 by default because a
+complete item includes a 16x16 icon, model geometry and optional Lua. Responses with
+`finish_reason: "length"` are rejected at the provider boundary instead of passing partial JSON
+to validation; the normal generation retry path can then request a fresh complete item.
+
 `./gradlew test` runs 39 tests across three suites:
 
 - `ScriptSandboxTest` - the hostile corpus: infinite loops, recursion, allocation bombs, `pcall`
